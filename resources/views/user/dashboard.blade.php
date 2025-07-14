@@ -6,20 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                <div class="card">
-                    <div class="card-header">Menu</div>
-                    <div class="list-group list-group-flush">
-                        <a href="{{ route('user.dashboard') }}" class="list-group-item list-group-item-action active">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                        <a href="{{ route('user.pengajuan.create') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-plus"></i> Ajukan Surat
-                        </a>
-                        <a href="{{ route('profile.edit') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-user"></i> Edit Profile
-                        </a>
-                    </div>
-                </div>
+                @include('components.user-menu')
             </div>
 
             <div class="col-md-9">
@@ -63,7 +50,6 @@
                                                 <tr>
                                                     <th>No</th>
                                                     <th>Tanggal Pengajuan</th>
-                                                    <th>Jenis Surat</th>
                                                     <th>Status</th>
                                                     <th>Aksi</th>
                                                 </tr>
@@ -73,7 +59,6 @@
                                                     <tr>
                                                         <td>{{ $index + 1 }}</td>
                                                         <td>{{ $pengajuan->tanggal_pengajuan->format('d/m/Y H:i') }}</td>
-                                                        <td>{{ $pengajuan->jenis_surat }}</td>
                                                         <td>{!! $pengajuan->status_badge !!}</td>
                                                         <td>
                                                             <a href="{{ route('user.pengajuan.show', $pengajuan->id) }}"

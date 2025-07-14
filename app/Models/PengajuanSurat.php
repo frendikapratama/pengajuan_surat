@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class PengajuanSurat extends Model
@@ -41,6 +42,12 @@ class PengajuanSurat extends Model
         return $this->file_surat ? asset('storage/' . $this->file_surat) : null;
     }
 
+    public function getJenisSuratUrlAttribute()
+    {
+        return $this->jenis_surat ? asset('storage/' . $this->jenis_surat) : null;
+    }
+
+    
     // Accessor untuk status badge
     public function getStatusBadgeAttribute()
     {

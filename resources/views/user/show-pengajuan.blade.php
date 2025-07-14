@@ -1,22 +1,31 @@
-// resources/views/user/show-pengajuan.blade.php
 @extends('layouts.app')
 
 @section('title', 'Detail Pengajuan')
 
 @section('content')
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
+        <div class="row">
+            <div class="col-md-3">
+                @include('components.user-menu')
+            </div>
+            <div class="col-md-9">
                 <div class="card">
                     <div class="card-header">
                         <h4>Detail Pengajuan Surat</h4>
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-md-6">
-                                <strong>Jenis Surat:</strong>
-                                <p>{{ $pengajuan->jenis_surat }}</p>
-                            </div>
+                            @if ($pengajuan->jenis_surat)
+                                <div class="col-6 mb-3">
+                                    <strong>Surat Pengantar Rt/Rw</strong>
+                                    <div class="mt-1">
+                                        <a href="{{ $pengajuan->jenis_surat_url }}" target="_blank">
+                                            <img src="{{ $pengajuan->jenis_surat_url }}" alt="jenis_surat"
+                                                class="img-thumbnail" style="max-width: 100px;">
+                                        </a>
+                                    </div>
+                                </div>
+                            @endif
                             <div class="col-md-6">
                                 <strong>Status:</strong>
                                 <p>{!! $pengajuan->status_badge !!}</p>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PengajuanSurat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -25,18 +26,29 @@ class UserController extends Controller
 
     public function storePengajuan(Request $request)
     {
-        $request->validate([
-            'keperluan' => 'required|string',
+        $validator = Validator::make($request->all(), [
+            'keperluan' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
+            'jenis_surat' => 'required|image|mimes:jpg,jpeg,png|max:5048',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $jenissuratPath = null;
+
+        if ($request->hasFile('jenis_surat')) {
+            $jenissuratPath = $request->file('jenis_surat')->store('jenis_surat', 'public');
+        }
 
         PengajuanSurat::create([
             'user_id' => auth()->id(),
-            'jenis_surat' => 'Surat Pengantar',
             'keperluan' => $request->keperluan,
             'keterangan' => $request->keterangan,
             'status' => 'pending',
             'tanggal_pengajuan' => now(),
+            'jenis_surat' => $jenissuratPath,
         ]);
 
         return redirect()->route('user.dashboard')->with('success', 'Pengajuan surat pengantar berhasil diajukan!');
