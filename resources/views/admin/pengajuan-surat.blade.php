@@ -24,7 +24,6 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Pemohon</th>
-                                        <th>Jenis Surat</th>
                                         <th>Keperluan</th>
                                         <th>Tanggal Pengajuan</th>
                                         <th>Status</th>
@@ -36,7 +35,6 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $pengajuan->user->profile->nama ?? $pengajuan->user->name }}</td>
-                                            <td>{{ $pengajuan->jenis_surat }}</td>
                                             <td>{{ Str::limit($pengajuan->keperluan, 50) }}</td>
                                             <td>{{ $pengajuan->tanggal_pengajuan->format('d/m/Y H:i') }}</td>
                                             <td>{!! $pengajuan->status_badge !!}</td>

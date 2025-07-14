@@ -1,4 +1,3 @@
-{{-- resources/views/admin/pengajuan-detail.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Detail Pengajuan Surat')
@@ -7,21 +6,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3">
-                <div class="card">
-                    <div class="card-header">Menu Admin</div>
-                    <div class="list-group list-group-flush">
-                        <a href="{{ route('admin.dashboard') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                        <a href="{{ route('admin.pending-users') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-user-clock"></i> Pending Users
-                        </a>
-                        <a href="{{ route('admin.pengajuan-surat') }}"
-                            class="list-group-item list-group-item-action active">
-                            <i class="fas fa-file-alt"></i> Pengajuan Surat
-                        </a>
-                    </div>
-                </div>
+                @include('components.admin-menu')
             </div>
 
             <div class="col-md-9">
@@ -58,10 +43,7 @@
                                                 <td width="40%"><strong>ID Pengajuan:</strong></td>
                                                 <td>#{{ $pengajuan->id }}</td>
                                             </tr>
-                                            <tr>
-                                                <td><strong>Jenis Surat:</strong></td>
-                                                <td>{{ $pengajuan->jenis_surat }}</td>
-                                            </tr>
+
                                             <tr>
                                                 <td><strong>Tanggal Pengajuan:</strong></td>
                                                 <td>{{ $pengajuan->tanggal_pengajuan->format('d/m/Y H:i') }}</td>
@@ -100,6 +82,17 @@
                                             <div class="mb-3">
                                                 <strong>Catatan Admin:</strong>
                                                 <p class="mt-1 text-info">{{ $pengajuan->catatan_admin }}</p>
+                                            </div>
+                                        @endif
+                                        @if ($pengajuan->jenis_surat)
+                                            <div class="col-6 mb-3">
+                                                <strong>Surat Pengantar Rt/Rw</strong>
+                                                <div class="mt-1">
+                                                    <a href="{{ $pengajuan->jenis_surat_url }}" target="_blank">
+                                                        <img src="{{ $pengajuan->jenis_surat_url }}" alt="jenis_surat"
+                                                            class="img-thumbnail" style="max-width: 100px;">
+                                                    </a>
+                                                </div>
                                             </div>
                                         @endif
                                     </div>
