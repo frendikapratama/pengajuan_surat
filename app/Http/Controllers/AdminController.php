@@ -6,9 +6,18 @@ use App\Models\User;
 use App\Models\PengajuanSurat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
+use App\Services\WhatsAppService;
 class AdminController extends Controller
 {
+    protected $whatsAppService;
+
+    public function __construct(WhatsAppService $whatsAppService)
+    {
+        $this->whatsAppService = $whatsAppService;
+    }
     public function dashboard()
     {
         $pendingUsers = User::where('status', 'pending')->where('role', 'user')->count();
@@ -30,21 +39,35 @@ class AdminController extends Controller
         return view('admin.pending-users', compact('users'));
     }
 
-    public function approveUser($id)
+ public function approveUser($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('profile')->findOrFail($id);
         $user->update(['status' => 'approved']);
 
-        return redirect()->back()->with('success', 'User berhasil disetujui!');
+        $whatsAppResult = $this->whatsAppService->sendUserApprovalNotification($user);
+        
+        if ($whatsAppResult['success']) {
+            return redirect()->back()->with('success', 'User berhasil disetujui dan notifikasi WhatsApp telah dikirim!');
+        } else {
+            return redirect()->back()->with('success', 'User berhasil disetujui, namun gagal mengirim notifikasi WhatsApp: ' . $whatsAppResult['message']);
+        }
     }
 
-    public function rejectUser($id)
+
+    public function rejectUser(Request $request, $id)
     {
         $user = User::findOrFail($id);
         $user->update(['status' => 'rejected']);
 
-        return redirect()->back()->with('success', 'User berhasil ditolak!');
+        $whatsAppResult = $this->whatsAppService->sendUserRejectionNotification($user);
+        
+        if ($whatsAppResult['success']) {
+            return redirect()->back()->with('success', 'User berhasil ditolak dan notifikasi WhatsApp telah dikirim!');
+        } else {
+            return redirect()->back()->with('success', 'User berhasil ditolak, namun gagal mengirim notifikasi WhatsApp: ' . $whatsAppResult['message']);
+        }
     }
+
 
     public function showUserDetail($id)
     {

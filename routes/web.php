@@ -18,7 +18,6 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Auth Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -26,14 +25,11 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
 
-// Protected Routes
 Route::middleware(['auth', 'check.approved'])->group(function () {
     
-    // Profile Routes
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 
-    // User Routes
     Route::middleware(['check.role:user'])->prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
         Route::get('/pengajuan/create', [UserController::class, 'createPengajuan'])->name('pengajuan.create');
@@ -41,8 +37,7 @@ Route::middleware(['auth', 'check.approved'])->group(function () {
         Route::get('/pengajuan/{id}', [UserController::class, 'showPengajuan'])->name('pengajuan.show');
     });
 
-    // Admin Routes
-    // Admin & Super Admin Routes
+  
 Route::middleware(['check.role:admin,super_admin'])->prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
