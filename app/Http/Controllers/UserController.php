@@ -6,9 +6,20 @@ use App\Models\PengajuanSurat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Services\WhatsAppService;
 
 class UserController extends Controller
 {
+
+    protected $whatsAppService;
+
+    public function __construct(WhatsAppService $whatsAppService)
+    {
+        $this->whatsAppService = $whatsAppService;
+    }
+
     public function dashboard()
     {
         $user = auth()->user();
@@ -51,6 +62,7 @@ class UserController extends Controller
             'jenis_surat' => $jenissuratPath,
         ]);
 
+         $whatsAppResult = $this->whatsAppService->sendUserApprovalNotification($user);
         return redirect()->route('user.dashboard')->with('success', 'Pengajuan surat pengantar berhasil diajukan!');
     }
 
