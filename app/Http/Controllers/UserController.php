@@ -36,35 +36,44 @@ class UserController extends Controller
     }
 
     public function storePengajuan(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'keperluan' => 'required|string|max:255',
-            'keterangan' => 'nullable|string',
-            'jenis_surat' => 'required|image|mimes:jpg,jpeg,png|max:5048',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'keperluan' => 'required|string|max:255',
+        'keterangan' => 'nullable|string',
+        'jenis_surat' => 'required|image|mimes:jpg,jpeg,png|max:5048',
+    ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $jenissuratPath = null;
-
-        if ($request->hasFile('jenis_surat')) {
-            $jenissuratPath = $request->file('jenis_surat')->store('jenis_surat', 'public');
-        }
-
-        PengajuanSurat::create([
-            'user_id' => auth()->id(),
-            'keperluan' => $request->keperluan,
-            'keterangan' => $request->keterangan,
-            'status' => 'pending',
-            'tanggal_pengajuan' => now(),
-            'jenis_surat' => $jenissuratPath,
-        ]);
-
-         $whatsAppResult = $this->whatsAppService->sendUserApprovalNotification($user);
-        return redirect()->route('user.dashboard')->with('success', 'Pengajuan surat pengantar berhasil diajukan!');
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
     }
+
+    $jenissuratPath = null;
+
+    if ($request->hasFile('jenis_surat')) {
+        $jenissuratPath = $request->file('jenis_surat')->store('jenis_surat', 'public');
+    }
+
+    $pengajuan = PengajuanSurat::create([
+        'user_id' => auth()->id(),
+        'keperluan' => $request->keperluan,
+        'keterangan' => $request->keterangan,
+        'status' => 'pending',
+        'tanggal_pengajuan' => now(),
+        'jenis_surat' => $jenissuratPath,
+    ]);
+
+    // Load relasi user dan profile untuk pengajuan yang baru dibuat
+    $pengajuan->load('user.profile');
+
+    // Kirim notifikasi WhatsApp
+    $whatsAppResult = $this->whatsAppService->sendPengajuanCreatedNotification($pengajuan);
+    
+    if ($whatsAppResult['success']) {
+        return redirect()->route('user.dashboard')->with('success', 'Pengajuan surat pengantar berhasil diajukan dan notifikasi WhatsApp telah dikirim!');
+    } else {
+        return redirect()->route('user.dashboard')->with('success', 'Pengajuan surat pengantar berhasil diajukan, namun gagal mengirim notifikasi WhatsApp: ' . $whatsAppResult['message']);
+    }
+}
 
     public function showPengajuan($id)
     {
