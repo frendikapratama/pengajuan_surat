@@ -260,4 +260,30 @@ class WhatsAppService
         
         return $this->sendMessage($phoneNumber, $message);
     }
+
+    /**
+ * Kirim notifikasi pengajuan surat berhasil dibuat
+ * 
+ * @param object $pengajuan - PengajuanSurat object
+ * @return array
+ */
+public function sendPengajuanCreatedNotification($pengajuan)
+{
+    $phoneNumber = $pengajuan->user->profile->no_telepon ?? null;
+    
+    if (!$phoneNumber) {
+        Log::warning('No phone number found for pengajuan: ' . $pengajuan->id);
+        return [
+            'success' => false,
+            'message' => 'Nomor telepon tidak ditemukan'
+        ];
+    }
+
+    // Ambil nama user, jika tidak ada gunakan "Bapak/Ibu"
+    $namaUser = $pengajuan->user->nama ?? $pengajuan->user->name ?? 'Bapak/Ibu';
+
+    $message = "Halo {$namaUser}, pengajuan surat Anda dengan keperluan '{$pengajuan->keperluan}' berhasil dikirim dan sedang menunggu review admin. Terima kasih.";
+    
+    return $this->sendMessage($phoneNumber, $message);
+}
 }
