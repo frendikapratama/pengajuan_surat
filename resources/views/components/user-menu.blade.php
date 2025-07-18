@@ -10,10 +10,5 @@
             class="list-group-item list-group-item-action {{ request()->routeIs('user.pengajuan.create') ? 'active' : '' }}">
             <i class="fas fa-plus"></i> Ajukan Surat
         </a>
-
-        <a href="{{ route('profile.edit') }}"
-            class="list-group-item list-group-item-action {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-            <i class="fas fa-user"></i> Edit Profile
-        </a>
     </div>
 </div>

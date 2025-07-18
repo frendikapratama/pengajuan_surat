@@ -217,10 +217,6 @@
                                 </div>
                             </div>
                         </div>
-
-
-
-
                         <div>
                             <div style="border-bottom: 1px solid #ccc; margin-bottom: 20px">
                             </div>
@@ -248,19 +244,19 @@
 
                             {{-- Diproses - Hanya Super Admin --}}
                             @if ($pengajuan->status === 'diproses' && auth()->user()->role === 'super_admin')
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
-                                            data-bs-target="#completeModal">
+                                <div class="col-md-6">
+                                    <form method="POST" action="{{ route('admin.pengajuan.complete', $pengajuan->id) }}"
+                                        class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm"
+                                            onclick="return confirm('Selesaikan pengajuan ini?')">
                                             <i class="fas fa-check"></i> Selesaikan
                                         </button>
-                                    </div>
-                                    <div class="col-md-6">
                                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                             data-bs-target="#rejectModal">
                                             <i class="fas fa-times"></i> Tolak
                                         </button>
-                                    </div>
+                                    </form>
                                 </div>
                             @endif
 
@@ -283,33 +279,6 @@
 
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Selesaikan -->
-    <div class="modal fade" id="completeModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Selesaikan Pengajuan</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form method="POST" action="{{ route('admin.pengajuan.complete', $pengajuan->id) }}"
-                    enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="catatan_admin" class="form-label">Catatan Admin</label>
-                            <textarea class="form-control" id="catatan_admin" name="catatan_admin" rows="3"
-                                placeholder="Catatan tambahan untuk pemohon..."></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-success">Selesaikan</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
