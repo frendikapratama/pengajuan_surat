@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-
 use App\Services\WhatsAppService;
+
 class AdminController extends Controller
 {
     protected $whatsAppService;
@@ -39,7 +39,7 @@ class AdminController extends Controller
         return view('admin.pending-users', compact('users'));
     }
 
- public function approveUser($id)
+    public function approveUser($id)
     {
         $user = User::with('profile')->findOrFail($id);
         $user->update(['status' => 'approved']);
@@ -89,28 +89,41 @@ class AdminController extends Controller
         $pengajuan = PengajuanSurat::findOrFail($id);
         $pengajuan->update(['status' => 'diproses']);
 
-        return redirect()->back()->with('success', 'Pengajuan surat sedang diproses!');
+        $whatsAppResult = $this->whatsAppService->sendPengajuanProcessingNotification($pengajuan);
+        if ($whatsAppResult['success']) {
+            return redirect()->back()->with('success', 'Pengajuan surat sedang diproses dan notifikasi WhatsApp telah dikirim!');
+        } else {
+            return redirect()->back()->with('success', 'Pengajuan surat sedang diproses, namun gagal mengirim notifikasi WhatsApp: ' . $whatsAppResult['message']);
+        }
+        // return redirect()->back()->with('success', 'Pengajuan surat sedang diproses!');
     }
 
     public function completePengajuan(Request $request, $id)
     {
         $request->validate([
-            'file_surat' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'file_surat' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
             'catatan_admin' => 'nullable|string',
         ]);
 
         $pengajuan = PengajuanSurat::findOrFail($id);
         
-        $filePath = $request->file('file_surat')->store('surat_keluar', 'public');
+        // $filePath = $request->file('file_surat')->store('surat_keluar', 'public');
 
         $pengajuan->update([
             'status' => 'selesai',
-            'file_surat' => $filePath,
+            // 'file_surat' => $filePath,
             'catatan_admin' => $request->catatan_admin,
             'tanggal_selesai' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Pengajuan surat berhasil diselesaikan!');
+        $whatsAppResult = $this->whatsAppService->sendPengajuanCompletedNotification($pengajuan);
+    
+        if ($whatsAppResult['success']) {
+            return redirect()->back()->with('success', 'Pengajuan surat berhasil diselesaikan dan notifikasi WhatsApp telah dikirim!');
+        } else {
+            return redirect()->back()->with('success', 'Pengajuan surat berhasil diselesaikan, namun gagal mengirim notifikasi WhatsApp: ' . $whatsAppResult['message']);
+        }
+        // return redirect()->back()->with('success', 'Pengajuan surat berhasil diselesaikan!');
     }
 
     public function rejectPengajuan(Request $request, $id)
@@ -125,7 +138,14 @@ class AdminController extends Controller
             'catatan_admin' => $request->catatan_admin,
         ]);
 
-        return redirect()->back()->with('success', 'Pengajuan surat berhasil ditolak!');
+        $whatsAppResult = $this->whatsAppService->sendPengajuanRejectedNotification($pengajuan);
+
+        if ($whatsAppResult['success']) {
+            return redirect()->back()->with('success', 'Pengajuan surat berhasil ditolak dan notifikasi WhatsApp telah dikirim!');
+        } else {
+            return redirect()->back()->with('success', 'Pengajuan surat berhasil ditolak, namun gagal mengirim notifikasi WhatsApp: ' . $whatsAppResult['message']);
+        }
+        // return redirect()->back()->with('success', 'Pengajuan surat berhasil ditolak!');
     }
 
     public function showPengajuanDetail($id)

@@ -159,7 +159,6 @@ class WhatsAppService
             ];
         }
 
-        // Ambil nama user, jika tidak ada gunakan "Bapak/Ibu"
         $namaUser = $user->nama ?? $user->name ?? 'Bapak/Ibu';
 
         $message = "Halo {$namaUser}, mohon maaf akun Anda tidak dapat disetujui.";
@@ -194,7 +193,7 @@ class WhatsAppService
         // Ambil nama user, jika tidak ada gunakan "Bapak/Ibu"
         $namaUser = $pengajuan->user->nama ?? $pengajuan->user->name ?? 'Bapak/Ibu';
 
-        $message = "Halo {$namaUser}, pengajuan surat Anda dengan jenis '{$pengajuan->jenis_surat}' telah selesai diproses. Silakan login ke sistem untuk mengunduh surat.";
+        $message = "Halo {$namaUser}, pengajuan surat Anda  telah selesai diproses. Silakan kunjungi kelurahan untuk mengambil surat .";
         
         if ($pengajuan->catatan_admin) {
             $message .= " Catatan: {$pengajuan->catatan_admin}";
@@ -224,13 +223,40 @@ class WhatsAppService
         // Ambil nama user, jika tidak ada gunakan "Bapak/Ibu"
         $namaUser = $pengajuan->user->nama ?? $pengajuan->user->name ?? 'Bapak/Ibu';
 
-        $message = "Halo {$namaUser}, mohon maaf pengajuan surat Anda dengan jenis '{$pengajuan->jenis_surat}' tidak dapat diproses.";
+        $message = "Halo {$namaUser}, mohon maaf pengajuan surat Anda tidak dapat diproses.";
         
         if ($pengajuan->catatan_admin) {
             $message .= " Alasan: {$pengajuan->catatan_admin}";
         }
         
         $message .= " Silakan hubungi admin untuk informasi lebih lanjut.";
+        
+        return $this->sendMessage($phoneNumber, $message);
+    }
+
+
+    /**
+ * Kirim notifikasi pengajuan surat sedang diproses
+ * 
+ * @param object $pengajuan - PengajuanSurat object
+ * @return array
+ */
+
+    public function sendPengajuanProcessingNotification($pengajuan)
+    {
+        $phoneNumber = $pengajuan->user->profile->no_telepon ?? null;
+        
+        if (!$phoneNumber) {
+            Log::warning('No phone number found for pengajuan: ' . $pengajuan->id);
+            return [
+                'success' => false,
+                'message' => 'Nomor telepon tidak ditemukan'
+            ];
+        }
+
+        $namaUser = $pengajuan->user->nama ?? $pengajuan->user->name ?? 'Bapak/Ibu';
+
+        $message = "Halo {$namaUser}, pengajuan surat Anda dengan  sedang diproses dan . Silakan login ke sistem untuk melihat status pengajuan.";
         
         return $this->sendMessage($phoneNumber, $message);
     }

@@ -300,13 +300,6 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="file_surat" class="form-label">Upload File Surat <span
-                                    class="text-danger">*</span></label>
-                            <input type="file" class="form-control" id="file_surat" name="file_surat"
-                                accept=".pdf,.doc,.docx" required>
-                            <div class="form-text">Format yang didukung: PDF, DOC, DOCX (Max: 2MB)</div>
-                        </div>
-                        <div class="mb-3">
                             <label for="catatan_admin" class="form-label">Catatan Admin</label>
                             <textarea class="form-control" id="catatan_admin" name="catatan_admin" rows="3"
                                 placeholder="Catatan tambahan untuk pemohon..."></textarea>
